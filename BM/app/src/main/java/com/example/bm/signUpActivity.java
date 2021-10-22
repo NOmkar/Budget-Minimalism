@@ -82,8 +82,10 @@ public class signUpActivity extends AppCompatActivity {
         userLogin = (TextView) findViewById (R.id.tvUserLogin);
         confirmPassword = (EditText) findViewById(R.id.etUserPassword2);
 
+        System.out.println("Set up the views");
+
     }
-    private Boolean validate(){
+    Boolean validate(){
         Boolean result = false;
 
         String name = userName.getText().toString();
@@ -106,4 +108,5 @@ public class signUpActivity extends AppCompatActivity {
         return result;
 
     }
+
 }

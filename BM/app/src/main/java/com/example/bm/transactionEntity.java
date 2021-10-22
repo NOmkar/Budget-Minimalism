@@ -1,6 +1,8 @@
 package com.example.bm;
 
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -39,6 +41,34 @@ public class transactionEntity {
     @NonNull
     public String getDescription() {
         return this.description;
+    }
+
+    // To make sure system doesn't encounter a numbers or any other meaningless values
+    public int verifyDescriptionDetails (String description) {
+        int x;
+        // Verifying that this is a string
+        try {
+            x = Integer.parseInt(description);
+            return 1;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    // To make sure system doesn't encounter a NULL pointer exception
+    public boolean isDescriptionNull() {
+        if (this.description == null) {
+            return true;
+        }
+        return false;
+    }
+
+    // To make sure system doesn't encounter an empty string
+    public boolean isDescriptionEmpty() {
+        if (this.description.equals("")) {
+            return true;
+        }
+        return false;
     }
 
     /* Uncomment after learning more about columns
