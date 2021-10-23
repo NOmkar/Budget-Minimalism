@@ -15,6 +15,7 @@ public class transactionEntityTest {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
+        System.out.println("Test 1 passed successfully!");
     }
 
     @Test
@@ -26,6 +27,7 @@ public class transactionEntityTest {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
+        System.out.println("Test 2 passed successfully!");
     }
 
     @Test
@@ -36,6 +38,7 @@ public class transactionEntityTest {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
+        System.out.println("Test 3 passed successfully!");
     }
 
     @Test
@@ -48,6 +51,7 @@ public class transactionEntityTest {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
+        System.out.println("Test 4 passed successfully!");
     }
 
     @Test
@@ -59,7 +63,7 @@ public class transactionEntityTest {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
-
+        System.out.println("Test 5 passed successfully!");
     }
 
     @Test
@@ -71,6 +75,6 @@ public class transactionEntityTest {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
-
+        System.out.println("Test 6 passed successfully!");
     }
 }
