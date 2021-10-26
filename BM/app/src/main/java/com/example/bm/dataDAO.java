@@ -37,4 +37,7 @@ public interface dataDAO {
     @Query("select * from transaction_table where amount =:amount")
     List<transactionEntity> getDescriptionA(double amount);
 
+    @Query("select * from budget_table")
+    List<BudgetEntity> getBudgetDetails();
+
 }
