@@ -12,6 +12,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".resetPassword"
+            android:exported="false" />
+        <activity
             android:name=".setBudgetActivity2"
             android:exported="true" />
         <activity

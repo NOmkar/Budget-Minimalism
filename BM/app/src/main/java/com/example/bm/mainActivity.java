@@ -26,6 +26,7 @@ public class mainActivity extends AppCompatActivity {
     private TextView Info;
     private Button Login;
     private Button Back;
+    private TextView resetPass;
 
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
@@ -40,6 +41,7 @@ public class mainActivity extends AppCompatActivity {
         Password = (EditText)findViewById(R.id.pass);
         Login = (Button) findViewById(R.id.btnLogin);
         Back = (Button) findViewById(R.id.backButton);
+        resetPass=(TextView)findViewById(R.id.resetPassword);
 
         //Database helper
         firebaseAuth = FirebaseAuth.getInstance();
@@ -85,6 +87,14 @@ public class mainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mainActivity.this, initialScreen.class);
+                startActivity(intent);
+                mainActivity.this.finish();
+            }
+        });
+        resetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mainActivity.this, resetPassword.class);
                 startActivity(intent);
                 mainActivity.this.finish();
             }
