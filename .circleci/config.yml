@@ -2,16 +2,17 @@
 # See: https://circleci.com/docs/2.0/language-java/
 version: 2.1
 
-before_script:
-  - chmod +x ./gradlew
-
 orbs:
   android: circleci/android@1.0.3
   gcp-cli: circleci/gcp-cli@2.2.0
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+
+
 jobs:
+  before_script:
+    - chmod +x ./gradlew
   unit-test:
     executor:
       name: android/android-machine
