@@ -180,7 +180,7 @@ workflows:
       - release-build:
           requires:
             - unit-test
-            - android-test-all
+        #    - android-test-all
             - benchmarks-emulator
             - benchmarks-ftl
           filters:
