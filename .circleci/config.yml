@@ -156,6 +156,7 @@ jobs:
 workflows:
   test-and-build:
     jobs:
+      - before_script
       - unit-test
       - android/run-ui-tests:
           filters:
