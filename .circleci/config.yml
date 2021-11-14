@@ -26,16 +26,17 @@ variables:
   ANDROID_SDK_TOOLS: "6514223"
 
 # Packages installation before running script
-before_script:
-  # Nothing fancy here, just checking sdkManager version
-  - sdkmanager --version
-
-  # Not necessary, but just for surity
-  - chmod +x ./gradlew
 
 # Basic android and gradle stuff
 # Check linting
 jobs:
+  before_script:
+    # Nothing fancy here, just checking sdkManager version
+
+    # Not necessary, but just for surity
+    script:
+      - chmod +x ./gradlew
+
   lintDebug:
     interruptible: true
     stage: build
@@ -58,3 +59,10 @@ jobs:
     stage: test
     script:
       - ./gradlew -Pci --console=plain :app:testDebug
+      
+workflows:
+   jobs:
+     - before_script
+     - lintDebug
+     - assembleDebug
+     - debugTests
