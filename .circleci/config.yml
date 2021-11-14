@@ -20,7 +20,9 @@ jobs:
       - android/restore-gradle-cache
       - android/restore-build-cache
       - android/run-tests:
-          test-command: ./gradlew testDebug
+          test-command: |
+              chmod +x gradlew
+              ./gradlew testDebug
       - android/save-gradle-cache
       - android/save-build-cache
       - run:
@@ -95,6 +97,9 @@ jobs:
             command: |
               mkdir ~/benchmarks
               adb pull /storage/emulated/0/Android/media/com.circleci.samples.todoapp.macrobenchmark ~/benchmarks
+        - run:
+             name: chmod permissions
+             command: chmod +x ./gradlew
         - store_artifacts:
             path: ~/benchmarks
      
