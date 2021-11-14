@@ -11,11 +11,6 @@ orbs:
 
 
 jobs:
-  before_script:
-    steps:
-      run:
-        command: |
-          chmod +x ./gradlew
   unit-test:
     executor:
       name: android/android-machine
@@ -160,7 +155,6 @@ jobs:
 workflows:
   test-and-build:
     jobs:
-      - before_script
       - unit-test
       - android/run-ui-tests:
           filters:
