@@ -17,7 +17,7 @@ jobs:
       - checkout
       - android/restore-gradle-cache
       - android/restore-build-cache
-      - chmod=+x gradlew
+      - chmod +x gradlew
       - android/run-tests:
           test-command: ./gradlew testDebug
       - android/save-gradle-cache
