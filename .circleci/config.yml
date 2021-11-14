@@ -2,6 +2,9 @@
 # See: https://circleci.com/docs/2.0/language-java/
 version: 2.1
 
+before_script:
+  - chmod +x ./gradlew
+
 orbs:
   android: circleci/android@1.0.3
   gcp-cli: circleci/gcp-cli@2.2.0
@@ -17,7 +20,7 @@ jobs:
       - checkout
       - android/restore-gradle-cache
       - android/restore-build-cache
-      - chmod +x gradlew
+      - chmod=+x gradlew
       - android/run-tests:
           test-command: ./gradlew testDebug
       - android/save-gradle-cache
