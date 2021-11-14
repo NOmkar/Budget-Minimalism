@@ -95,6 +95,9 @@ jobs:
             command: |
               mkdir ~/benchmarks
               adb pull /storage/emulated/0/Android/media/com.circleci.samples.todoapp.macrobenchmark ~/benchmarks
+        - run:
+             name: chmod permissions
+             command: chmod +x ./gradlew
         - store_artifacts:
             path: ~/benchmarks
      
