@@ -1,46 +1,182 @@
 # Java Gradle CircleCI 2.0 configuration file
 # See: https://circleci.com/docs/2.0/language-java/
-version: 2
+version: 2.1
+
+orbs:
+  android: circleci/android@1.0.3
+  gcp-cli: circleci/gcp-cli@2.2.0
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+
+
 jobs:
-  build:
+  unit-test:
+    executor:
+      name: android/android-machine
+      resource-class: xlarge
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - android/run-tests:
+          test-command: ./gradlew testDebug
+      - android/save-gradle-cache
+      - android/save-build-cache
+      - run:
+          name: Save test results
+          command: |
+              mkdir -p ~/test-results/junit/
+              find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+      - store_artifacts:
+          path: ~/test-results/junit
+
+#---sayma---workflows:
+  #--test-and-build:
+  
+  #--build:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
+    #--docker:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      #--- image: circleci/openjdk:8-jdk
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-    working_directory: ~/repo
+    #--working_directory: ~/repo
 
-    environment:
+    #--environment:
       # Customize the JVM maximum heap limit
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
+      #--JVM_OPTS: -Xmx3200m
+      #--TERM: dumb
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
+    #--steps:
       - checkout
 
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "BM/app/build.gradle" }}
+      #--- restore_cache:
+         #-- keys:
+            #-- v1-dependencies-{{ checksum "BM/app/build.gradle" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            #-- v1-dependencies-
 
-      - run: gradle dependencies
+      #--- run: gradle dependencies
 
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "BM/app/build.gradle" }}
+      #--- save_cache:
+         #-- paths:
+            #-- ~/.gradle
+         #-- key: v1-dependencies-{{ checksum "BM/app/build.gradle" }}
 
       # run tests!
-      - run: gradle test
+     #-- - run: gradle test
+     
+  benchmarks-emulator:
+      executor:
+        name: android/android-machine
+        resource-class: xlarge
+      steps:
+        - checkout
+        - android/start-emulator-and-run-tests:
+            test-command: adb shell am instrument -w -m -e androidx.benchmark.suppressErrors EMULATOR -e debug false -e androidx.benchmark.output.enable true com.circleci.samples.todoapp.macrobenchmark/androidx.test.runner.AndroidJUnitRunner
+            system-image: system-images;android-30;google_apis;x86
+            post-emulator-launch-assemble-command: ./gradlew app:assembleRelease macrobenchmark:assemble
+            post-emulator-wait-steps:
+              - run: ./gradlew app:installRelease macrobenchmark:installRelease
+            kill-emulators: false
+        - run:
+            name: Pull benchmark data from emulator
+            command: |
+              mkdir ~/benchmarks
+              adb pull /storage/emulated/0/Android/media/com.circleci.samples.todoapp.macrobenchmark ~/benchmarks
+        - store_artifacts:
+            path: ~/benchmarks
+     
+  benchmarks-ftl:
+     executor:
+       name: android/android
+       sdk-version: "30"
+       variant: node
+     steps:
+       - checkout
+       - android/restore-gradle-cache
+       - android/restore-build-cache
+       - run:
+           name: Build app and test app
+           command: ./gradlew app:assembleRelease macrobenchmark:assemble
+       - gcp-cli/initialize:
+           gcloud-service-key: GCP_SA_KEY
+           google-project-id: GCP_PROJECT_ID
+       - run:
+           name: run on FTL
+           command: |
+             gcloud firebase test android run \
+               --type instrumentation \
+               --app app/build/outputs/apk/release/app-release.apk \
+               --test macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk \
+               --device model=flame,version=30,locale=en,orientation=portrait \
+               --directories-to-pull /sdcard/Download \
+               --results-bucket gs://android-sample-benchmarks \
+               --results-dir macrobenchmark \
+               --environment-variables clearPackageData=true,additionalTestOutputDir=/sdcard/Download,no-isolated-storage=true
+       - run:
+           name: Download benchmark data
+           command: |
+             mkdir ~/benchmarks
+             gsutil cp -r 'gs://android-sample-benchmarks/macrobenchmark/**/artifacts/sdcard/Download/*'  ~/benchmarks
+             gsutil rm -r gs://android-sample-benchmarks/macrobenchmark
+       - store_artifacts:
+             path: ~/benchmarks
+       - run:
+           name: Evaluate benchmark results
+           command: node scripts/eval_startup_benchmark_output.js
+
+  release-build:
+    executor:
+      name: android/android-machine
+      resource-class: xlarge
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - run:
+          name: Assemble release build
+          command: |
+            ./gradlew assembleRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+
+workflows:
+  test-and-build:
+    jobs:
+      - unit-test
+      - android/run-ui-tests:
+          filters:
+            branches:
+              ignore: main # regular commits
+      #later--- android-test:
+      #later--    matrix:
+       #later--     alias: android-test-all
+      #later--      parameters:
+      #later--        system-image:
+       #later--         - system-images;android-30;google_apis;x86
+        #later--        - system-images;android-29;google_apis;x86
+       #later--         - system-images;android-28;google_apis;x86
+        #later--        - system-images;android-27;google_apis;x86
+        #later--        - system-images;android-26;google_apis;x86
+        #later--        - system-images;android-25;google_apis;x86
+        #later--        - system-images;android-24;google_apis;x86
+        #later--        - system-images;android-23;google_apis;x86
+       #later--   name: android-test-<<matrix.system-image>>
+        #later--  filters:
+        #later--    branches:
+       #later--       only: main # Commits to main branch
+      - benchmarks-emulator
+      - benchmarks-ftl
+     
