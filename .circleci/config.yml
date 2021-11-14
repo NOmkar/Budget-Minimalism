@@ -71,7 +71,7 @@ jobs:
 
       #--- save_cache:
          #-- paths:
-            - ~/.gradle
+            #-- ~/.gradle
          #-- key: v1-dependencies-{{ checksum "BM/app/build.gradle" }}
 
       # run tests!
