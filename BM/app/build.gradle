@@ -16,7 +16,7 @@ android {
     }
 
     task wrapper(type: Wrapper) {
-        gradleVersion = '2.0' //version required
+        gradleVersion = '7.0.1' //version required
     }
 
 
@@ -55,9 +55,9 @@ android {
 
 }
 
-task wrapper(type: Wrapper) {
+/*task wrapper(type: Wrapper) {
     gradleVersion = '7.0.2'
-}
+}*/
 
 dependencies {
     implementation 'androidx.test:core:1.4.0'
