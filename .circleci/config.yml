@@ -12,7 +12,8 @@ orbs:
 
 jobs:
   before_script:
-    - chmod +x ./gradlew
+    steps:
+      - chmod +x ./gradlew
   unit-test:
     executor:
       name: android/android-machine
